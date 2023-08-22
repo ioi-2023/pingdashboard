@@ -1,0 +1,178 @@
+<html>
+
+<head>
+  <title>IOI 2023 Contestant Laptop Status</title>
+
+  <style>
+    body {
+      max-width: 1600px;
+      margin: auto;
+      padding: 10px;
+    }
+
+    table.seats {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    table.seats td {
+      font-family: Arial, Helvetica, sans-serif;
+      height: 30px;
+      width: 55px;
+      border: 1px solid black;
+      text-align: center;
+    }
+
+    td.placeholder {
+      border: 1px solid white !important;
+      min-width: 40px;
+    }
+
+    td.legend {
+      height: 25px;
+      width: 95px;
+      border: 1px solid black;
+      text-align: center;
+    }
+
+    td.alive {
+      background-color: limegreen;
+    }
+
+    td.dead {
+      color: white;
+      background-color: red;
+    }
+
+    span.ip {
+      font-size: small;
+    }
+
+  </style>
+
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript">
+    const rows = 20;
+    const columns = 20;
+
+    function generateTable(sectionObj) {
+      let table = $('<table>', { 'class': 'seats' });
+      sectionObj.append(table);
+
+      let header = $('<tr>');
+      table.append(header);
+      header.append($('<th>'));
+      for (let j = 1; j <= columns / 2; j++) {
+        header.append($('<th>').text(j));
+      }
+      header.append($('<th>'));
+      for (let j = columns / 2 + 1; j <= columns; j++) {
+        header.append($('<th>').text(j));
+      }
+      header.append($('<th>'));
+
+      for (let i = 1; i <= rows; i++) {
+        const rowId = String.fromCharCode(64 + i);
+        let row = $('<tr>', {'id': rowId});
+        table.append(row);
+        row.append($('<td>', {'class': 'placeholder'}).text(rowId));
+        for (let j = 1; j <= columns / 2; j++) {
+          row.append($('<td>', {'id': rowId + j}));
+        }
+        row.append($('<td>', {'class': 'placeholder'}).text(rowId));
+          for (let j = columns / 2 + 1; j <= columns; j++) {
+          row.append($('<td>', {'id': rowId + j}));
+        }
+        row.append($('<td>', {'class': 'placeholder'}).text(rowId));
+      }
+    }
+
+    function fetchStatus() {
+      $.get('site.json', function (site) {
+        let seatLookup = {};
+        for (let i = 1; i <= rows; i++) {
+          const rowId = String.fromCharCode(64 + i);
+          for (let j = 1; j <= columns; j++) {
+            const seatId = rowId + j;
+            let seat = $('#' + seatId);
+            seat.text("");
+            if (site[seatId]) {
+              seat.html(site[seatId].user + '<br><span class="ip">' + site[seatId].ip + '</span>');
+              seatLookup[site[seatId].user] = seatId;
+            }
+          }
+        }
+        
+        $.get('status.json', function (status) {
+          $('#time').text(new Date(status.time * 1000));
+
+          function setCellStatus(cell, status) {
+            cell.removeClass('alive');
+            cell.removeClass('dead');
+
+            if (status) {
+              if (status == '-') {
+                cell.addClass('dead');
+              } else {
+                cell.addClass('alive');
+                cell.attr('title', 'ping: ' + status + ' ms');
+              }
+            }
+          }
+
+          for (var i = 0; i < status.results.length; i++) {
+            var result = status.results[i];
+            var cell = $('#' + seatLookup[result[0]]);
+            if (cell) {
+              setCellStatus(cell, result[1]);
+            }
+          }
+
+          setTimeout(fetchStatus, 5000);
+        });
+      });
+      
+    }
+
+    $(document).ready(function () {
+      generateTable($('div#status-container'));
+      // update data
+      fetchStatus();
+    });
+  </script>
+</head>
+
+<body>
+  <h1 style="text-align: center;">IOI 2023 Contestant Laptop Status</h1>
+
+  <br />
+
+  <p><small>Last updated: <span id="time"></span></small></p>
+
+  <div id="status-container" style="margin: 0px; padding: 0px;">
+  
+  </div>
+
+  <br />
+  <br />
+  <br />
+
+  <small>Legend</small>
+  <table>
+    <tbody>
+      <tr>
+        <td class="legend alive"><small>Connected</small></td>
+        <td><small>(hover to see ping speed)</small></td>
+      </tr>
+      <tr>
+        <td class="legend dead"><small>Disconnected</small></td>
+      </tr>
+      <tr>
+        <td class="legend"><small>Never connected</small></td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+team_code,first_name,last_name,email,username,password,ip,vpn_servers,online
+HUN,Test,Contestant 1,contestant1@ioi2023.hu,TESTHUN1,pw1,10.10.0.101,pop1:pop2,0
+HUN,Test,Contestant 2,contestant2@ioi2023.hu,TESTHUN2,pw2,10.10.0.102,pop1:pop3,0
+IOI1,Test,Contestant 3,contestant3@ioi2023.hu,TESTIOI1,pw3,10.10.0.103,pop2:pop3,0
+IOI2,Test,Contestant 4,contestant4@ioi2023.hu,TESTIOI2,pw4,10.10.0.104,pop1:pop2,0
