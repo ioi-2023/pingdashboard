@@ -1,1 +1,1 @@
-# pingdashboard
+# Contestant Machine Status Dashboard
